@@ -13,7 +13,7 @@ const db = new pg.Client({
     user: "postgres",
     host: "localhost",
     database: "world",
-    password: "db_password",
+    password: db_password,
     port: 5432,
 });
 
@@ -23,7 +23,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
 app.get("/", async (req, res) => {
-
+    const result = await db.query("SELECT country_code FROM visited_countries");
+    let countries = [];
+    result.rows.forEach((country) => {
+        countries.push(country.country_code);
+    });
+    console.log(result.rows);
+    res.render("index.ejs", { countries: countries, total: countries.length });
+    db.end();
 });
 
 app.listen(port, () => {
